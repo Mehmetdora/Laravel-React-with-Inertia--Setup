@@ -1,66 +1,217 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel + React (Inertia.js ile) Proje Kurulumu
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Bu rehber, Laravel ve React'i Inertia.js ile entegre ederek nasıl bir proje kurulacağını adım adım açıklar(Bir Inertia view return edilir). Tabiki Inertia.js kullanmadan sadece Laravel API kullanılarak gönderilen veriler React tarafında alınarak da kullanılabilir.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1️⃣ **Laravel Projesini Oluşturma**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Laravel'i Kur
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Terminalde aşağıdaki komutu çalıştırarak yeni bir Laravel projesi oluşturun:
 
-## Learning Laravel
+```sh
+laravel new my-app
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Alternatif olarak, aşağıdaki komutla Laravel'i Composer ile de kurabilirsiniz:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```sh
+composer create-project laravel/laravel my-app
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Projenize girin:
 
-## Laravel Sponsors
+```sh
+cd my-app
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Laravel Starter Kit (Opsiyonel)
 
-### Premium Partners
+Eğer React ve Inertia.js’in önceden yapılandırılmış olmasını istiyorsanız, aşağıdaki komutu çalıştırabilirsiniz:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```sh
+composer require laravel/breeze --dev
+php artisan breeze:install react
+npm install && npm run dev
+```
 
-## Contributing
+Ancak, bu rehberde React ve Inertia.js’i elle kuracağız.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 2️⃣ **Vite ve NPM Kurulumu**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Blade Template dosyanızda** aşağıdaki kodu ekleyerek Vite’i etkinleştirin:
 
-## Security Vulnerabilities
+```blade
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Vite'in çalışması için npm paketlerini yükleyin:
 
-## License
+```sh
+npm install
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Bunlar, Laravel'in frontend tarafını derlemek için gereklidir.
+
+---
+
+## 3️⃣ **React Kurulumu**
+
+Şimdi React'ı yükleyelim:
+
+```sh
+npm install react react-dom
+```
+
+Ayrıca, Vite ile React’ı kullanabilmek için şu eklentiyi yükleyin:
+
+```sh
+npm install -D @vitejs/plugin-react
+```
+
+Şimdi **`vite.config.js`** dosyanızı açın ve aşağıdaki kodu ekleyin:
+
+```js
+import { defineConfig } from "vite";
+import laravel from "laravel-vite-plugin";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ["resources/css/app.css", "resources/js/app.jsx"],
+            refresh: true,
+        }),
+        react(),
+    ],
+});
+```
+
+Bu adımlar, Laravel projenize React desteği ekler.
+
+---
+
+## 4️⃣ **Inertia.js Kurulumu**
+
+Şimdi Laravel ve React arasında köprü görevi görecek olan Inertia.js’i yükleyelim.
+
+### Backend (Laravel) İçin Kurulum:
+
+```sh
+composer require inertiajs/inertia-laravel
+```
+
+Şimdi Inertia için bir Middleware ekleyin:
+
+```sh
+php artisan inertia:middleware
+```
+
+Middleware’i **`bootstrap/app.php`** dosyanızda `web` middleware grubuna ekleyin:
+
+```php
+$middleware->web(append: [
+    \App\Http\Middleware\HandleInertiaRequests::class,
+]);
+```
+
+Laravel, Inertia’nın ana dosyasını **`app.blade.php`** olarak arar. Bu yüzden **`welcome.blade.php`** dosyanızın adını **`app.blade.php`** olarak değiştirin.
+
+Ardından, **`routes/web.php`** içinde şu şekilde bir yönlendirme yapın:
+
+```php
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return Inertia::render('Home');
+});
+```
+
+Bu, Inertia ile **React bileşeni (Home.jsx)** yükleyecek şekilde ayarlanmıştır.
+
+---
+
+## 5️⃣ **Frontend (React) İçin Inertia.js Kurulumu**
+
+Şimdi Inertia'nın React tarafını yükleyelim:
+
+```sh
+npm install @inertiajs/react
+```
+
+Ardından **`resources/js/app.jsx`** dosyanızı oluşturun ve aşağıdaki kodu ekleyin:
+
+```jsx
+import { createInertiaApp } from "@inertiajs/react";
+import { createRoot } from "react-dom/client";
+import "./bootstrap";
+
+createInertiaApp({
+    resolve: (name) => {
+        const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true });
+        return pages[`./Pages/${name}.jsx`];
+    },
+    setup({ el, App, props }) {
+        createRoot(el).render(<App {...props} />);
+    },
+});
+```
+
+Bu kod, Inertia.js’in React bileşenlerini bulup yüklemesini sağlar.
+
+Ayrıca, **`app.blade.php`** içinde aşağıdaki kodları eklediğinizden emin olun:
+
+```blade
+@viteReactRefresh
+@vite(['resources/css/app.css', 'resources/js/app.jsx'])
+@inertiaHead
+```
+
+Bu kodlar, Vite’in **React Hot Module Reloading (HMR)** desteğini etkinleştirir.
+
+---
+
+## 6️⃣ **React Bileşeni Oluşturma**
+
+Artık React bileşenleri oluşturabiliriz. **`resources/js/Pages/Home.jsx`** dosyanızı oluşturun ve aşağıdaki kodları ekleyin:
+
+```jsx
+export default function Home() {
+    return (
+        <div>
+            <h1>Merhaba, Inertia.js Çalışıyor!</h1>
+        </div>
+    );
+}
+```
+
+---
+
+## 7️⃣ **Projenin Çalıştırılması**
+
+Şimdi Laravel ve Vite’i başlatalım:
+
+Laravel’i çalıştırın:
+
+```sh
+php artisan serve
+```
+
+Vite’i çalıştırın:
+
+```sh
+npm run dev
+```
+
+Tarayıcınızda `http://127.0.0.1:8000/` adresini açarak projenizin çalıştığını görebilirsiniz! 🚀
+
+---
+
+## 🎯 **Sonuç**
+
+Bu rehberde, Laravel ve React’i Inertia.js kullanarak nasıl entegre edeceğimizi adım adım öğrendik. Artık React bileşenlerinizi Laravel içinde kullanabilir ve modern bir frontend/backend entegrasyonu sağlayabilirsiniz! 🚀
